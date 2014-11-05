@@ -1,0 +1,7 @@
+@mixin test {
+	background: blue;
+}
+
+body {
+	@include test;
+}
