@@ -1,15 +1,33 @@
 var gulp = require('gulp'),
+    notify = require('gulp-notify'),
+    del = require('del'),
+    rename = require('gulp-rename'),
+    concat = require('gulp-concat'),
+    cache = require('gulp-cache'),
+    
+    browserSync = require('browser-sync'),
+	reload = browserSync.reload,
+    
+    //mustache = require("gulp-mustache"),
     minifycss = require('gulp-minify-css'),
     uglify = require('gulp-uglify'),
     jshint = require('gulp-jshint'),
-    imagemin = require('gulp-imagemin'),
-    rename = require('gulp-rename'),
-    concat = require('gulp-concat'),
-    notify = require('gulp-notify'),
-    cache = require('gulp-cache'),
-    browserSync = require('browser-sync'),
-	reload = browserSync.reload,
-    del = require('del');
+    imagemin = require('gulp-imagemin');
+    
+
+
+function errorHandler(error) {
+  notify('Error: ' + error.message);
+}
+
+// HTML
+gulp.task('html', function() {
+  return gulp.src("components/pages/*.mustache")
+    //.pipe(mustache())
+    .pipe(rename({ extname: '' }))
+    .pipe(gulp.dest("build"))
+    .pipe(notify("HTML OK"));
+});
 
 
 // Styles
@@ -18,38 +36,39 @@ gulp.task('styles', function() {
     .pipe(rename({ suffix: '.min' }))
     .pipe(minifycss())
     .pipe(gulp.dest('build/assets/styles'))
-    .pipe(notify({ message: 'Styles task complete' }));
+    .pipe(notify("Styles OK"));
 });
 
 
 // Scripts
 gulp.task('scripts', function() {
   return gulp.src('components/**/*.js')
-    .pipe(jshint('.jshintrc'))
-    .pipe(jshint.reporter('default'))
     .pipe(concat('main.js'))
     .pipe(rename({ suffix: '.min' }))
     .pipe(uglify())
     .pipe(gulp.dest('build/assets/scripts'))
-    .pipe(notify({ message: 'Scripts task complete' }));
+    .pipe(notify("Scripts OK"));
 });
 
 
 
 // Clean
 gulp.task('clean', function(cb) {
-    del(['build/**/*'], cb)
+  del(['build/**/*'], cb)
 });
 
 
 // Default task
 gulp.task('default', ['clean'], function() {
-    gulp.start('styles', 'scripts');
+  gulp.start('html', 'styles', 'scripts');
 });
 
 
 // Watch
 gulp.task('watch', function() {
+  
+  // Watch .liquid files
+  gulp.watch('components/**/.liquid', ['html']);
   
   // Watch .scss files
   gulp.watch('components/.css', ['styles']);
