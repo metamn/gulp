@@ -8,7 +8,9 @@ var gulp = require('gulp'),
     browserSync = require('browser-sync'),
 	reload = browserSync.reload,
     
-    //mustache = require("gulp-mustache"),
+    savefile = require('gulp-savefile'),
+    tpl = require('gulp-tpl'),
+    
     minifycss = require('gulp-minify-css'),
     uglify = require('gulp-uglify'),
     jshint = require('gulp-jshint'),
@@ -22,9 +24,9 @@ function errorHandler(error) {
 
 // HTML
 gulp.task('html', function() {
-  return gulp.src("components/pages/*.mustache")
-    //.pipe(mustache())
-    .pipe(rename({ extname: '' }))
+  return gulp.src("components/pages/*.hbs")
+    .pipe(tpl.html())
+    .pipe(savefile())
     .pipe(gulp.dest("build"))
     .pipe(notify("HTML OK"));
 });
@@ -32,7 +34,7 @@ gulp.task('html', function() {
 
 // Styles
 gulp.task('styles', function() {
-  return gulp.src('components/*.css')
+  return gulp.src('components/screen.css')
     .pipe(rename({ suffix: '.min' }))
     .pipe(minifycss())
     .pipe(gulp.dest('build/assets/styles'))
