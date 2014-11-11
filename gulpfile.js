@@ -24,8 +24,8 @@ function errorHandler(error) {
 
 // HTML
 gulp.task('html', function() {
-  return gulp.src("components/pages/*.hbs")
-    .pipe(tpl.html())
+  return gulp.src("components/**/*.hbs")
+    .pipe(tpl.html({registerFullPath: true}))
     .pipe(savefile())
     .pipe(gulp.dest("build"))
     .pipe(notify("HTML OK"));
