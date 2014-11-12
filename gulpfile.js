@@ -8,6 +8,8 @@ var gulp = require('gulp'),
 	reload = browserSync.reload,
     
     swig = require('gulp-swig'),
+    data = require('gulp-data'),
+    fm = require('front-matter'),
     
     minifycss = require('gulp-minify-css'),
     uglify = require('gulp-uglify');
@@ -22,6 +24,11 @@ function errorHandler(error) {
 // HTML
 gulp.task('html', function() {
   return gulp.src('components/**/*.html')
+    .pipe(data(function(file) {
+      var content = fm(String(file.contents));
+      file.contents = new Buffer(content.body);
+      return content.attributes;
+    }))
     .pipe(swig())
     .pipe(gulp.dest('build'))
     .pipe(notify("HTML OK"));
