@@ -3,18 +3,13 @@ var gulp = require('gulp'),
     del = require('del'),
     rename = require('gulp-rename'),
     concat = require('gulp-concat'),
-    cache = require('gulp-cache'),
     
     browserSync = require('browser-sync'),
 	reload = browserSync.reload,
     
-    savefile = require('gulp-savefile'),
-    tpl = require('gulp-tpl'),
     
     minifycss = require('gulp-minify-css'),
-    uglify = require('gulp-uglify'),
-    jshint = require('gulp-jshint'),
-    imagemin = require('gulp-imagemin');
+    uglify = require('gulp-uglify');
     
 
 
@@ -22,14 +17,6 @@ function errorHandler(error) {
   notify('Error: ' + error.message);
 }
 
-// HTML
-gulp.task('html', function() {
-  return gulp.src("components/**/*.hbs")
-    .pipe(tpl.html({registerFullPath: true}))
-    .pipe(savefile())
-    .pipe(gulp.dest("build"))
-    .pipe(notify("HTML OK"));
-});
 
 
 // Styles
