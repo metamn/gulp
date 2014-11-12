@@ -7,6 +7,7 @@ var gulp = require('gulp'),
     browserSync = require('browser-sync'),
 	reload = browserSync.reload,
     
+    swig = require('gulp-swig'),
     
     minifycss = require('gulp-minify-css'),
     uglify = require('gulp-uglify');
@@ -17,6 +18,14 @@ function errorHandler(error) {
   notify('Error: ' + error.message);
 }
 
+
+// HTML
+gulp.task('html', function() {
+  return gulp.src('components/**/*.html')
+    .pipe(swig())
+    .pipe(gulp.dest('build'))
+    .pipe(notify("HTML OK"));
+});
 
 
 // Styles
