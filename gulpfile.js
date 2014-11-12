@@ -5,7 +5,7 @@ var gulp = require('gulp'),
     concat = require('gulp-concat'),
 
     browserSync = require('browser-sync'),
-	reload = browserSync.reload,
+  	reload = browserSync.reload,
 
     swig = require('gulp-swig'),
     data = require('gulp-data'),
@@ -48,8 +48,10 @@ gulp.task('html', function() {
 
 
 // Styles
+// - moves all .css friles from components/ to build/assets/styles
+// - .css is created by Compass not Gulp
 gulp.task('styles', function() {
-  return gulp.src('components/screen.css')
+  return gulp.src('components/*.css')
     .pipe(rename({ suffix: '.min' }))
     .pipe(minifycss())
     .pipe(gulp.dest('build/assets/styles'))
@@ -58,6 +60,7 @@ gulp.task('styles', function() {
 
 
 // Scripts
+// - collects all .js files into main.js, then minify into main.min.js, then move to build/assets/scripts
 gulp.task('scripts', function() {
   return gulp.src('components/**/*.js')
     .pipe(concat('main.js'))
@@ -84,18 +87,6 @@ gulp.task('default', ['clean'], function() {
 // Watch
 gulp.task('watch', function() {
 
-  // Watch swig files
-  gulp.watch('components/**/.swig', ['swig']);
-
-  // Move compiled html
-  gulp.watch('components/pages/*.html', ['html']);
-
-  // Watch .scss files
-  gulp.watch('components/.css', ['styles']);
-
-  // Watch .js files
-  gulp.watch('components/**/*.js', ['scripts']);
-
   browserSync({
     notify: false,
     server: {
@@ -104,6 +95,6 @@ gulp.task('watch', function() {
   });
 
   // Watch any files in dist/, reload on change
-  gulp.watch(['dist/**']).on('change', reload);
+  gulp.watch(['components/**/*'], ['clean', 'swig', 'html', 'styles', 'scripts', reload]);
 
 });

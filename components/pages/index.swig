@@ -2,12 +2,12 @@
 title: YAML
 ---
 
-{{ title }}
+<p>{{ title }}</p>
 
 
-{% for i in [1, 2, 3, 4] %}
+{% for i in [1, 2, 3] %}
   {{ i }}
 {% endfor %}
 
 
-{% include "../atoms/test.html" with { name : "pepe" } %}
+{% include "../atoms/test.html" with { name : "pepita" } %}
