@@ -3,9 +3,7 @@ var gulp = require('gulp'),
     del = require('del'),
     rename = require('gulp-rename'),
     concat = require('gulp-concat'),
-
     browserSync = require('browser-sync'),
-  	reload = browserSync.reload,
 
     swig = require('gulp-swig'),
     data = require('gulp-data'),
@@ -15,15 +13,9 @@ var gulp = require('gulp'),
     uglify = require('gulp-uglify');
 
 
-
-function errorHandler(error) {
-  notify('Error: ' + error.message);
-}
-
-
 // Swig
 // - compiles a .swig file with YAML front matter
-// - renames to .html in the same folder
+// - renames to .html and moves to build/
 gulp.task('swig', function() {
   return gulp.src('components/**/*.swig')
     .pipe(data(function(file) {
@@ -31,19 +23,14 @@ gulp.task('swig', function() {
       file.contents = new Buffer(content.body);
       return content.attributes;
     }))
-    .pipe(swig())
+    .pipe(swig({
+      defaults: {
+        cache: false
+      }
+    }))
     .pipe(rename({ extname: '.html' }))
-    .pipe(gulp.dest('components'))
-    .pipe(notify("Swig OK"));
-});
-
-
-// HTML
-// - moves all .html files from components/pages to build/
-gulp.task('html', function() {
-  return gulp.src('components/pages/*.html')
     .pipe(gulp.dest('build'))
-    .pipe(notify("HTML OK"));
+    .pipe(browserSync.reload({stream:true}));
 });
 
 
@@ -55,7 +42,7 @@ gulp.task('styles', function() {
     .pipe(rename({ suffix: '.min' }))
     .pipe(minifycss())
     .pipe(gulp.dest('build/assets/styles'))
-    .pipe(notify("Styles OK"));
+    .pipe(browserSync.reload({stream:true}));
 });
 
 
@@ -67,9 +54,8 @@ gulp.task('scripts', function() {
     .pipe(rename({ suffix: '.min' }))
     .pipe(uglify())
     .pipe(gulp.dest('build/assets/scripts'))
-    .pipe(notify("Scripts OK"));
+    .pipe(browserSync.reload({stream:true}));
 });
-
 
 
 // Clean
@@ -80,21 +66,27 @@ gulp.task('clean', function(cb) {
 
 // Default task
 gulp.task('default', ['clean'], function() {
-  gulp.start('swig', 'html', 'styles', 'scripts');
+  gulp.start('swig', 'styles', 'scripts');
 });
 
 
-// Watch
-gulp.task('watch', function() {
 
+// Start the server
+gulp.task('start-server', function() {
   browserSync({
-    notify: false,
     server: {
-      baseDir: ['build']
+      baseDir: "build/pages/"
     }
   });
+});
 
-  // Watch any files in dist/, reload on change
-  gulp.watch(['components/**/*'], ['clean', 'swig', 'html', 'styles', 'scripts', reload]);
 
+
+// Watch
+gulp.task('watch', ['default', 'start-server'], function () {
+  var watcher = gulp.watch('components/**/*', ['default']);
+  watcher.on('change', function (event) {
+    console.log('Event type: ' + event.type); // added, changed, or deleted
+    console.log('Event path: ' + event.path); // The path of the modified file
+  });
 });

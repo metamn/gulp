@@ -10,4 +10,4 @@ title: YAML
 {% endfor %}
 
 
-{% include "../atoms/test.html" with { name : "pepita" } %}
+{% include "../atoms/test.html" with { name : "lolka" } %}
