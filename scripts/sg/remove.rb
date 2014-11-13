@@ -9,6 +9,7 @@ class Remove
     @object_partial = @utils.partial @object
 
     remove
+    remove_folders
   end
 
   def remove
@@ -20,5 +21,11 @@ class Remove
     puts system("rm #{@utils.html}/#{@object}#{@utils.ext}")
     puts system("rm #{@utils.css}/#{@object_partial}.scss")
     puts system("rm #{@utils.sg}/#{@object}#{@utils.ext}")
+  end
+
+  def remove_folders
+    folder = @utils.split @object, 1
+    puts system("rmdir -p #{@utils.html}/#{folder}")
+    puts system("rmdir -p #{@utils.sg}/#{folder}")
   end
 end
