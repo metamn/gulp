@@ -15,14 +15,16 @@ var gulp = require('gulp'),
 
 // Folder structure
 var paths = {
-  swig: 'components/**/*.swig',
+  swig: 'components/pages/*.swig',
   css: 'components/pages/*.css',
   js: 'components/**/*.js',
   build: 'build',
   build_styles: 'build/assets/styles',
   build_scripts: 'build/assets/scripts',
   build_pages: 'build/pages/*.html',
+  build_styleguide: 'build/pages/styleguide/**/*.html',
   site: 'site',
+  home: 'site/home/index.html',
 };
 
 
@@ -71,24 +73,29 @@ gulp.task('scripts', function() {
 });
 
 
-// Clean
-gulp.task('clean', function(cb) {
-  del([paths.build + '/**/*'], cb)
+// Clean build/
+gulp.task('clean-build', function() {
+  del([paths.build + '/**/*'])
+});
+
+
+// Clean site/
+gulp.task('clean-site', function() {
+  del([paths.site + '/**/*'])
 });
 
 
 // Default task
-// - this task builds the site into /build
-gulp.task('default', ['clean'], function() {
+// - this task builds the components/ into /build
+gulp.task('default', ['clean-build'], function() {
   gulp.start('swig', 'styles', 'scripts');
 });
 
 
-// Site
-// - compacting files from build/ into site/
-gulp.task('site', function() {
-  del([paths.site + '/**/*']);
-
+// Pages
+// - compacting files from build/pages into site/
+// - ex: build/pages/home.html => site/home/index.html
+gulp.task('pages', function() {
   return gulp.src(paths.build_pages)
     .pipe(rename(function(path) {
       path.dirname = path.basename;
@@ -96,6 +103,38 @@ gulp.task('site', function() {
     }))
     .pipe(gulp.dest(paths.site))
   ;
+});
+
+
+// Styleguide
+// - compacting files from build/pages/styleguide into site/
+// - ex: build/pages/styleguide/pages/home.html => site/styleguide/pages/home/index.html
+gulp.task('styleguide', function() {
+  return gulp.src(paths.build_styleguide)
+    .pipe(rename(function(path) {
+      path.dirname = '/styleguide/' + path.dirname + '/' + path.basename + '/';
+      path.basename = 'index';
+    }))
+    .pipe(gulp.dest(paths.site))
+  ;
+});
+
+
+// Home
+// - making a homepage from an existing page
+// ex: site/home/index.html => index.html
+gulp.task('home', function() {
+  return gulp.src(paths.home)
+    .pipe(rename('index.html'))
+    .pipe(gulp.dest(paths.site))
+});
+
+
+// Site
+// - compacting files from build/ into /site
+gulp.task('site', ['clean-site', 'pages', 'styleguide'], function() {
+  gulp.start('home');
+  del(['site/home']);
 });
 
 
