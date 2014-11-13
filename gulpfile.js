@@ -1,12 +1,14 @@
 
-// Components based static site generator
+// Atomic components based static site generator
+// ---------------------------------------------
+//
 //
 // Folders:
 // - components: the source code
 // - assets: source assets
 // - scripts: Styleguide generator (or other) scripts
-// - _build: swig files compiled to html
-// - _site: _build/ urls rewritten to act as a normal
+// - build: swig files compiled to html. they preserve the atomic model
+// - site: the atomic model urls from _build packaged to normal website urls
 //
 //
 // Rules:
@@ -48,16 +50,16 @@ var gulp = require('gulp'),
 
 // Folder structure
 var paths = {
-  swig: 'components/pages/*.swig',
+  swig: 'components/**/*.swig',
   css: 'components/pages/*.css',
   js: 'components/**/*.js',
-  build: '_build',
-  build_styles: '_build/assets/styles',
-  build_scripts: '_build/assets/scripts',
-  build_pages: '_build/pages/*.html',
-  build_styleguide: '_build/pages/styleguide/**/*.html',
-  site: '_site',
-  home: '_site/home/index.html',
+  build: 'build',
+  build_styles: 'build/assets/styles',
+  build_scripts: 'build/assets/scripts',
+  build_pages: 'build/pages/*.html',
+  build_styleguide: 'build/pages/styleguide/**/*.html',
+  site: 'site',
+  home: 'site/home/index.html',
 };
 
 
@@ -167,7 +169,7 @@ gulp.task('home', function() {
 // - compacting files from build/ into /site
 gulp.task('site', ['clean-site', 'pages', 'styleguide'], function() {
   gulp.start('home');
-  del(['_site/home']);
+  del(['site/home']);
 });
 
 
