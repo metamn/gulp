@@ -1,3 +1,4 @@
+// Plugins
 var gulp = require('gulp'),
     del = require('del'),
     rename = require('gulp-rename'),
@@ -12,11 +13,22 @@ var gulp = require('gulp'),
     uglify = require('gulp-uglify');
 
 
+// Folder structure
+var paths = {
+  swig: 'components/**/*.swig',
+  css: 'components/pages/*.css',
+  js: 'components/**/*.js',
+  build: 'build',
+  build_styles: 'build/assets/styles',
+  build_scripts: 'build/assets/scripts',
+};
+
+
 // Swig
 // - compiles a .swig file with YAML front matter
 // - renames to .html and moves to build/
 gulp.task('swig', function() {
-  return gulp.src('components/**/*.swig')
+  return gulp.src(paths.swig)
     .pipe(data(function(file) {
       var content = fm(String(file.contents));
       file.contents = new Buffer(content.body);
@@ -28,7 +40,7 @@ gulp.task('swig', function() {
       }
     }))
     .pipe(rename({ extname: '.html' }))
-    .pipe(gulp.dest('build'))
+    .pipe(gulp.dest(paths.build))
     .pipe(browserSync.reload({stream:true}));
 });
 
@@ -37,10 +49,10 @@ gulp.task('swig', function() {
 // - moves all .css friles from components/ to build/assets/styles
 // - .css is created by Compass not Gulp
 gulp.task('styles', function() {
-  return gulp.src('components/*.css')
+  return gulp.src(paths.css)
     .pipe(rename({ suffix: '.min' }))
     .pipe(minifycss())
-    .pipe(gulp.dest('build/assets/styles'))
+    .pipe(gulp.dest(paths.build_styles))
     .pipe(browserSync.reload({stream:true}));
 });
 
@@ -48,18 +60,18 @@ gulp.task('styles', function() {
 // Scripts
 // - collects all .js files into main.js, then minify into main.min.js, then move to build/assets/scripts
 gulp.task('scripts', function() {
-  return gulp.src('components/**/*.js')
+  return gulp.src(paths.js)
     .pipe(concat('main.js'))
     .pipe(rename({ suffix: '.min' }))
     .pipe(uglify())
-    .pipe(gulp.dest('build/assets/scripts'))
+    .pipe(gulp.dest(paths.build_scripts))
     .pipe(browserSync.reload({stream:true}));
 });
 
 
 // Clean
 gulp.task('clean', function(cb) {
-  del(['build/**/*'], cb)
+  del([paths.build + '/**/*'], cb)
 });
 
 
@@ -74,7 +86,7 @@ gulp.task('default', ['clean'], function() {
 gulp.task('start-server', function() {
   browserSync({
     server: {
-      baseDir: "build/pages/"
+      baseDir: paths.build + '/pages/'
     }
   });
 });
@@ -84,11 +96,12 @@ gulp.task('start-server', function() {
 // Watch
 // - different file type changes are watched separately
 gulp.task('watch', ['default', 'start-server'], function () {
-  gulp.watch('components/**/*.swig', ['swig'])
+  gulp.watch(paths.swig, ['swig'])
     .on('change', function(event) {
-      console.log('File ' + event.path + ' was ' + event.type + ', running tasks...');
+      // deleted files are not always catched ... it's like a bug
+      console.log('File ' + event.path + ' was ' + event.type);
     });
 
-  gulp.watch('components/**/*.scss', ['styles']);
-  gulp.watch('components/**/*.js', ['scripts']);
+  gulp.watch(paths.css, ['styles']);
+  gulp.watch(paths.js, ['scripts']);
 });
