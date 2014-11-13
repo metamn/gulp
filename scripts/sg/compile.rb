@@ -1,20 +1,20 @@
 require 'filewatcher'
 
 class Compile
-  def initialize(file)
+  def initialize(file, utils)
     @root = Dir.pwd
     @destination = '_site/assets/styles'
     @extension = file + '.liquid'
     @file = file
-    
+
     do_compile
   end
-  
-  
+
+
   # The .liquid file is compiled to .scss by Jekyll and put in _site/
   # We take this file and put in assets/styles
   # ex: /_site/assets/styles/atoms/test.liquid => /assets/styles/atoms/_test.scss
-  
+
   def do_compile
     # Do watch
     puts "Watching #{@extension} files in #{@destination}"
@@ -23,7 +23,7 @@ class Compile
     FileWatcher.new(["#{@destination}/*#{@extension}", "#{@destination}/**/#{@extension}"]).watch do |filename|
       puts "Compile: " + compile.to_s
 
-      if compile 
+      if compile
         # filename: ./_site/assets/styles/atoms/test.liquid
         puts "Updated " + filename
 
@@ -37,7 +37,7 @@ class Compile
         # remove _site
         scss = scss.sub "_site/", ""
         #puts "Subs " + scss
-        
+
         # rename "test" to "_test" since we are using SASS partials
         scss = scss.sub @file, "_#{@file}"
 
@@ -52,4 +52,3 @@ class Compile
     end
   end
 end
-
