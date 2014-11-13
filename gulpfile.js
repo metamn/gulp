@@ -1,10 +1,8 @@
 var gulp = require('gulp'),
-    notify = require('gulp-notify'), // can be removed
     del = require('del'),
     rename = require('gulp-rename'),
     concat = require('gulp-concat'),
     browserSync = require('browser-sync'),
-    newer = require('gulp-newer'), // not working yet
 
     swig = require('gulp-swig'),
     data = require('gulp-data'),
@@ -19,7 +17,6 @@ var gulp = require('gulp'),
 // - renames to .html and moves to build/
 gulp.task('swig', function() {
   return gulp.src('components/**/*.swig')
-    .pipe(newer('build'))
     .pipe(data(function(file) {
       var content = fm(String(file.contents));
       file.contents = new Buffer(content.body);
@@ -41,7 +38,6 @@ gulp.task('swig', function() {
 // - .css is created by Compass not Gulp
 gulp.task('styles', function() {
   return gulp.src('components/*.css')
-    .pipe(newer('build/assets/styles'))
     .pipe(rename({ suffix: '.min' }))
     .pipe(minifycss())
     .pipe(gulp.dest('build/assets/styles'))
@@ -53,7 +49,6 @@ gulp.task('styles', function() {
 // - collects all .js files into main.js, then minify into main.min.js, then move to build/assets/scripts
 gulp.task('scripts', function() {
   return gulp.src('components/**/*.js')
-    .pipe(newer('build/assets/scripts'))
     .pipe(concat('main.js'))
     .pipe(rename({ suffix: '.min' }))
     .pipe(uglify())
@@ -87,8 +82,13 @@ gulp.task('start-server', function() {
 
 
 // Watch
+// - different file type changes are watched separately
 gulp.task('watch', ['default', 'start-server'], function () {
-  gulp.watch('components/**/*.swig', ['swig']);
+  gulp.watch('components/**/*.swig', ['swig'])
+    .on('change', function(event) {
+      console.log('File ' + event.path + ' was ' + event.type + ', running tasks...');
+    });
+
   gulp.watch('components/**/*.scss', ['styles']);
   gulp.watch('components/**/*.js', ['scripts']);
 });
