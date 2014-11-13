@@ -1,3 +1,3 @@
 // testJs
-var j = 0;
+var j = 1;
 j++;

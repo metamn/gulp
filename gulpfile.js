@@ -1,9 +1,10 @@
 var gulp = require('gulp'),
-    notify = require('gulp-notify'),
+    notify = require('gulp-notify'), // can be removed
     del = require('del'),
     rename = require('gulp-rename'),
     concat = require('gulp-concat'),
     browserSync = require('browser-sync'),
+    newer = require('gulp-newer'), // not working yet
 
     swig = require('gulp-swig'),
     data = require('gulp-data'),
@@ -18,6 +19,7 @@ var gulp = require('gulp'),
 // - renames to .html and moves to build/
 gulp.task('swig', function() {
   return gulp.src('components/**/*.swig')
+    .pipe(newer('build'))
     .pipe(data(function(file) {
       var content = fm(String(file.contents));
       file.contents = new Buffer(content.body);
@@ -39,6 +41,7 @@ gulp.task('swig', function() {
 // - .css is created by Compass not Gulp
 gulp.task('styles', function() {
   return gulp.src('components/*.css')
+    .pipe(newer('build/assets/styles'))
     .pipe(rename({ suffix: '.min' }))
     .pipe(minifycss())
     .pipe(gulp.dest('build/assets/styles'))
@@ -50,6 +53,7 @@ gulp.task('styles', function() {
 // - collects all .js files into main.js, then minify into main.min.js, then move to build/assets/scripts
 gulp.task('scripts', function() {
   return gulp.src('components/**/*.js')
+    .pipe(newer('build/assets/scripts'))
     .pipe(concat('main.js'))
     .pipe(rename({ suffix: '.min' }))
     .pipe(uglify())
@@ -84,9 +88,7 @@ gulp.task('start-server', function() {
 
 // Watch
 gulp.task('watch', ['default', 'start-server'], function () {
-  var watcher = gulp.watch('components/**/*', ['default']);
-  watcher.on('change', function (event) {
-    console.log('Event type: ' + event.type); // added, changed, or deleted
-    console.log('Event path: ' + event.path); // The path of the modified file
-  });
+  gulp.watch('components/**/*.swig', ['swig']);
+  gulp.watch('components/**/*.scss', ['styles']);
+  gulp.watch('components/**/*.js', ['scripts']);
 });
