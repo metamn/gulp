@@ -1,3 +1,36 @@
+
+// Components based static site generator
+//
+// Folders:
+// - components: the source code
+// - assets: source assets
+// - scripts: Styleguide generator (or other) scripts
+// - _build: swig files compiled to html
+// - _site: _build/ urls rewritten to act as a normal
+//
+//
+// Rules:
+// 1. Do not add files manually. Let the styleguide generator add/move/remove the files
+//
+//
+// Usage:
+// 1. gulp watch && compass watch
+// 2. sg g pages/styleguide
+// 3. sg g pages/home
+//
+//
+// Known issues:
+// - gulp watch not always works when files are deleted
+//
+//
+// How it works
+// - .swig files are compiled to .html by this script
+// - .js files are concatenated into main.min.js by this script
+// - .scss files are compiled to .css by Compass
+
+
+
+
 // Plugins
 var gulp = require('gulp'),
     del = require('del'),
@@ -18,13 +51,13 @@ var paths = {
   swig: 'components/pages/*.swig',
   css: 'components/pages/*.css',
   js: 'components/**/*.js',
-  build: 'build',
-  build_styles: 'build/assets/styles',
-  build_scripts: 'build/assets/scripts',
-  build_pages: 'build/pages/*.html',
-  build_styleguide: 'build/pages/styleguide/**/*.html',
-  site: 'site',
-  home: 'site/home/index.html',
+  build: '_build',
+  build_styles: '_build/assets/styles',
+  build_scripts: '_build/assets/scripts',
+  build_pages: '_build/pages/*.html',
+  build_styleguide: '_build/pages/styleguide/**/*.html',
+  site: '_site',
+  home: '_site/home/index.html',
 };
 
 
@@ -85,9 +118,9 @@ gulp.task('clean-site', function() {
 });
 
 
-// Default task
+// Build
 // - this task builds the components/ into /build
-gulp.task('default', ['clean-build'], function() {
+gulp.task('build', ['clean-build'], function() {
   gulp.start('swig', 'styles', 'scripts');
 });
 
@@ -134,7 +167,13 @@ gulp.task('home', function() {
 // - compacting files from build/ into /site
 gulp.task('site', ['clean-site', 'pages', 'styleguide'], function() {
   gulp.start('home');
-  del(['site/home']);
+  del(['_site/home']);
+});
+
+
+// Default: build + copy to site
+gulp.task('default', ['build'], function() {
+  gulp.start('site')
 });
 
 
@@ -142,7 +181,7 @@ gulp.task('site', ['clean-site', 'pages', 'styleguide'], function() {
 gulp.task('start-server', function() {
   browserSync({
     server: {
-      baseDir: paths.build + '/pages/'
+      baseDir: paths.site
     }
   });
 });
