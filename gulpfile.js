@@ -21,6 +21,8 @@ var paths = {
   build: 'build',
   build_styles: 'build/assets/styles',
   build_scripts: 'build/assets/scripts',
+  build_pages: 'build/pages/*.html',
+  site: 'site',
 };
 
 
@@ -76,10 +78,25 @@ gulp.task('clean', function(cb) {
 
 
 // Default task
+// - this task builds the site into /build
 gulp.task('default', ['clean'], function() {
   gulp.start('swig', 'styles', 'scripts');
 });
 
+
+// Site
+// - compacting files from build/ into site/
+gulp.task('site', function() {
+  del([paths.site + '/**/*']);
+
+  return gulp.src(paths.build_pages)
+    .pipe(rename(function(path) {
+      path.dirname = path.basename;
+      path.basename = 'index';
+    }))
+    .pipe(gulp.dest(paths.site))
+  ;
+});
 
 
 // Start the server
