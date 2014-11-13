@@ -54,11 +54,11 @@ var paths = {
   css: 'components/pages/*.css',
   js: 'components/**/*.js',
   build: 'build',
-  build_styles: 'build/assets/styles',
-  build_scripts: 'build/assets/scripts',
   build_pages: 'build/pages/*.html',
   build_styleguide: 'build/pages/styleguide/**/*.html',
   site: 'site',
+  site_styles: 'site/assets/styles',
+  site_scripts: 'site/assets/scripts',
   home: 'site/home/index.html',
 };
 
@@ -91,8 +91,7 @@ gulp.task('styles', function() {
   return gulp.src(paths.css)
     .pipe(rename({ suffix: '.min' }))
     .pipe(minifycss())
-    .pipe(gulp.dest(paths.build_styles))
-    .pipe(browserSync.reload({stream:true}));
+    .pipe(gulp.dest(paths.site_styles));
 });
 
 
@@ -103,8 +102,7 @@ gulp.task('scripts', function() {
     .pipe(concat('main.js'))
     .pipe(rename({ suffix: '.min' }))
     .pipe(uglify())
-    .pipe(gulp.dest(paths.build_scripts))
-    .pipe(browserSync.reload({stream:true}));
+    .pipe(gulp.dest(paths.site_scripts));
 });
 
 
@@ -180,7 +178,7 @@ gulp.task('default', ['build'], function() {
 
 
 // Start the server
-gulp.task('start-server', function() {
+gulp.task('server', function() {
   browserSync({
     server: {
       baseDir: paths.site
@@ -192,7 +190,7 @@ gulp.task('start-server', function() {
 
 // Watch
 // - different file type changes are watched separately
-gulp.task('watch', ['default', 'start-server'], function () {
+gulp.task('watch', ['default', 'server'], function () {
   gulp.watch(paths.swig, ['swig'])
     .on('change', function(event) {
       // deleted files are not always catched ... it's like a bug
