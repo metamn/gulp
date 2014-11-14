@@ -5,7 +5,7 @@
 //
 // Folders:
 // - components: the source code
-// - assets: source assets
+// - assets: all assets
 // - scripts: Styleguide generator (or other) scripts
 // - site: the generated website
 //
@@ -65,7 +65,7 @@ var paths = {
 
 
 // Swig
-// - compiles a .swig file with YAML front matter
+// - compiles a .swig file with YAML front matter into HTML
 gulp.task('swig', function() {
   return gulp.src(paths.swig)
     .pipe(data(function(file) {
@@ -85,7 +85,7 @@ gulp.task('swig', function() {
 
 // Styles
 // - moves all .css files from components/ to site/assets/styles
-// - .css is created by Compass not Gulp
+// - .css is created from .scss by Compass not Gulp
 gulp.task('styles', function() {
   return gulp.src(paths.css)
     .pipe(rename({ suffix: '.min' }))
@@ -156,8 +156,8 @@ gulp.task('clean', function(cb) {
 
 
 // The default task
-// - runSequence makes sure all tasks are running one after other
-// - otherwise Gulp is messing up everything with its async task runner
+// - runSequence makes sure all tasks are running one after another
+// - otherwise Gulp is messing up everything with it's async task runner
 gulp.task('default', function(cb) {
   runSequence(
     'clean',

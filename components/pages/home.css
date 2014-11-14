@@ -15,7 +15,7 @@ a img { border: none; }
 
 article, aside, details, figcaption, figure, footer, header, hgroup, main, menu, nav, section, summary { display: block; }
 
-/* No files to import found in atoms/**\/* */
-/* No files to import found in molecules/**\/* */
-/* No files to import found in organisms/**\/* */
+/* No files to import found in ../atoms/**\/* */
+/* No files to import found in ../molecules/**\/* */
+/* No files to import found in ../organisms/**\/* */
 body { background: lightblue; width: 10%; }
