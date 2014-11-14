@@ -39,6 +39,7 @@ var gulp = require('gulp'),
     rename = require('gulp-rename'),
     concat = require('gulp-concat'),
     browserSync = require('browser-sync'),
+    runSequence = require('run-sequence'),
 
     swig = require('gulp-swig'),
     data = require('gulp-data'),
@@ -59,7 +60,7 @@ var paths = {
   pages: 'components/pages/*.html',
   styleguide: 'components/pages/styleguide/**/*.html',
   site: 'site',
-  home: 'site/home/index.html',
+  home: 'site/home',
 };
 
 
@@ -105,19 +106,6 @@ gulp.task('scripts', function() {
 });
 
 
-// Clean site/
-gulp.task('clean', function() {
-  del([paths.site + '/**/*'])
-});
-
-
-// Build
-// - this task builds the components/ into /build
-gulp.task('build', ['clean-build'], function() {
-  gulp.start('swig', 'styles', 'scripts');
-});
-
-
 // Pages
 // - compacting files from build/pages into site/
 // - ex: build/pages/home.html => site/home/index.html
@@ -149,40 +137,55 @@ gulp.task('styleguide', function() {
 // Home
 // - making a homepage from an existing page
 // ex: site/home/index.html => index.html
-gulp.task('home', function() {
-  return gulp.src(paths.home)
+gulp.task('home', function(cb) {
+  gulp.src(paths.home + '/index.html')
     .pipe(rename('index.html'))
     .pipe(gulp.dest(paths.site))
+  del([paths.home]);
+  cb();
 });
 
 
-// Site
-// - compacting files from build/ into /site
-gulp.task('site', ['clean-site', 'pages', 'styleguide'], function() {
-  gulp.start('home');
-  del(['site/home']);
+
+// Clean site/
+gulp.task('clean', function(cb) {
+  del([paths.site + '/**/*']);
+  cb();
 });
 
 
-// Default: build + copy to site
-gulp.task('default', ['build'], function() {
-  gulp.start('site')
+
+
+// The default task
+gulp.task('default', function(cb) {
+  runSequence(
+    'clean',
+    'swig',
+    'styles',
+    'scripts',
+    'pages',
+    'styleguide',
+    'home',
+    cb
+  );
 });
 
 
-// Start the server
-gulp.task('server', function() {
+// Start server
+gulp.task('server', function(cb) {
   browserSync({
     server: {
       baseDir: paths.site
     }
   });
+
+  cb();
 });
 
 
-
 // Watch
-// - different file type changes are watched separately
-gulp.task('watch', ['default', 'server'], function () {
+gulp.task('watch', ['server'], function(cb) {
+  gulp.watch('components/**/*', ['default']);
 
+  cb();
 });
