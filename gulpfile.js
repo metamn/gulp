@@ -7,8 +7,7 @@
 // - components: the source code
 // - assets: source assets
 // - scripts: Styleguide generator (or other) scripts
-// - build: swig files compiled to html. they preserve the atomic model
-// - site: the atomic model urls from _build packaged to normal website urls
+// - site: the generated website
 //
 //
 // Rules:
@@ -26,8 +25,8 @@
 //
 //
 // How it works
-// - .swig files are compiled to .html by this script
-// - .js files are concatenated into main.min.js by this script
+// - .swig files are compiled to .html
+// - .js files are concatenated into main.min.js
 // - .scss files are compiled to .css by Compass
 
 
@@ -61,12 +60,12 @@ var paths = {
   styleguide: 'components/pages/styleguide/**/*.html',
   site: 'site',
   home: 'site/home',
+  watch: ['components/**/*.swig', 'components/pages/*.{js,css}']
 };
 
 
 // Swig
 // - compiles a .swig file with YAML front matter
-// - renames to .html and moves to build/
 gulp.task('swig', function() {
   return gulp.src(paths.swig)
     .pipe(data(function(file) {
@@ -85,7 +84,7 @@ gulp.task('swig', function() {
 
 
 // Styles
-// - moves all .css friles from components/ to build/assets/styles
+// - moves all .css files from components/ to site/assets/styles
 // - .css is created by Compass not Gulp
 gulp.task('styles', function() {
   return gulp.src(paths.css)
@@ -96,7 +95,7 @@ gulp.task('styles', function() {
 
 
 // Scripts
-// - collects all .js files into main.js, then minify into main.min.js, then move to build/assets/scripts
+// - collects all .js files into main.js, then minify into main.min.js, then move to site/assets/scripts
 gulp.task('scripts', function() {
   return gulp.src(paths.js)
     .pipe(concat('main.js'))
@@ -107,8 +106,8 @@ gulp.task('scripts', function() {
 
 
 // Pages
-// - compacting files from build/pages into site/
-// - ex: build/pages/home.html => site/home/index.html
+// - compacting pages
+// - ex: pages/home.html => home/index.html
 gulp.task('pages', function() {
   return gulp.src(paths.pages)
     .pipe(rename(function(path) {
@@ -121,8 +120,8 @@ gulp.task('pages', function() {
 
 
 // Styleguide
-// - compacting files from build/pages/styleguide into site/
-// - ex: build/pages/styleguide/pages/home.html => site/styleguide/pages/home/index.html
+// - compacting styleguide
+// - ex: styleguide/pages/home.html => styleguide/pages/home/index.html
 gulp.task('styleguide', function() {
   return gulp.src(paths.styleguide)
     .pipe(rename(function(path) {
@@ -136,7 +135,7 @@ gulp.task('styleguide', function() {
 
 // Home
 // - making a homepage from an existing page
-// ex: site/home/index.html => index.html
+// ex: home/index.html => index.html
 gulp.task('home', function(cb) {
   gulp.src(paths.home + '/index.html')
     .pipe(rename('index.html'))
@@ -157,6 +156,8 @@ gulp.task('clean', function(cb) {
 
 
 // The default task
+// - runSequence makes sure all tasks are running one after other
+// - otherwise Gulp is messing up everything with its async task runner
 gulp.task('default', function(cb) {
   runSequence(
     'clean',
@@ -185,7 +186,7 @@ gulp.task('server', function(cb) {
 
 // Watch
 gulp.task('watch', ['server'], function(cb) {
-  gulp.watch('components/**/*', ['default']);
+  gulp.watch(paths.watch, ['default']);
 
   cb();
 });

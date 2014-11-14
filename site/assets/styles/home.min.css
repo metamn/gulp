@@ -1,1 +1,1 @@
-body{background:red}
+body:before{white-space:pre;font-family:monospace;content:"Syntax error: Undefined mixin 'footer'.\A         on line 14 of /home/cs/work/gulp/components/pages/home.scss, in `footer'\A         from line 14 of /home/cs/work/gulp/components/pages/home.scss\A \A 9: \A 10: \A 11: body {\A 12:   background: lightblue;\A 13: \A 14:   @include footer;\A 15: }"}
