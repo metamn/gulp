@@ -50,15 +50,15 @@ var gulp = require('gulp'),
 
 // Folder structure
 var paths = {
+  components: 'components',
   swig: 'components/**/*.swig',
   css: 'components/pages/*.css',
   js: 'components/**/*.js',
-  build: 'build',
-  build_pages: 'build/pages/*.html',
-  build_styleguide: 'build/pages/styleguide/**/*.html',
+  styles: 'site/assets/styles',
+  scripts: 'site/assets/scripts',
+  pages: 'components/pages/*.html',
+  styleguide: 'components/pages/styleguide/**/*.html',
   site: 'site',
-  site_styles: 'site/assets/styles',
-  site_scripts: 'site/assets/scripts',
   home: 'site/home/index.html',
 };
 
@@ -79,8 +79,7 @@ gulp.task('swig', function() {
       }
     }))
     .pipe(rename({ extname: '.html' }))
-    .pipe(gulp.dest(paths.build))
-    .pipe(browserSync.reload({stream:true}));
+    .pipe(gulp.dest(paths.components));
 });
 
 
@@ -91,7 +90,7 @@ gulp.task('styles', function() {
   return gulp.src(paths.css)
     .pipe(rename({ suffix: '.min' }))
     .pipe(minifycss())
-    .pipe(gulp.dest(paths.site_styles));
+    .pipe(gulp.dest(paths.styles));
 });
 
 
@@ -102,18 +101,12 @@ gulp.task('scripts', function() {
     .pipe(concat('main.js'))
     .pipe(rename({ suffix: '.min' }))
     .pipe(uglify())
-    .pipe(gulp.dest(paths.site_scripts));
-});
-
-
-// Clean build/
-gulp.task('clean-build', function() {
-  del([paths.build + '/**/*'])
+    .pipe(gulp.dest(paths.scripts));
 });
 
 
 // Clean site/
-gulp.task('clean-site', function() {
+gulp.task('clean', function() {
   del([paths.site + '/**/*'])
 });
 
@@ -129,7 +122,7 @@ gulp.task('build', ['clean-build'], function() {
 // - compacting files from build/pages into site/
 // - ex: build/pages/home.html => site/home/index.html
 gulp.task('pages', function() {
-  return gulp.src(paths.build_pages)
+  return gulp.src(paths.pages)
     .pipe(rename(function(path) {
       path.dirname = path.basename;
       path.basename = 'index';
@@ -143,7 +136,7 @@ gulp.task('pages', function() {
 // - compacting files from build/pages/styleguide into site/
 // - ex: build/pages/styleguide/pages/home.html => site/styleguide/pages/home/index.html
 gulp.task('styleguide', function() {
-  return gulp.src(paths.build_styleguide)
+  return gulp.src(paths.styleguide)
     .pipe(rename(function(path) {
       path.dirname = '/styleguide/' + path.dirname + '/' + path.basename + '/';
       path.basename = 'index';
@@ -191,12 +184,5 @@ gulp.task('server', function() {
 // Watch
 // - different file type changes are watched separately
 gulp.task('watch', ['default', 'server'], function () {
-  gulp.watch(paths.swig, ['swig'])
-    .on('change', function(event) {
-      // deleted files are not always catched ... it's like a bug
-      console.log('File ' + event.path + ' was ' + event.type);
-    });
 
-  gulp.watch(paths.css, ['styles']);
-  gulp.watch(paths.js, ['scripts']);
 });
